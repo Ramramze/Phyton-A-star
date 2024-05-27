@@ -1,0 +1,105 @@
+import heapq
+
+class Graph:
+    def __init__(self):
+        self.edges = {}
+        self.heuristics = {}
+
+    def add_edge(self, from_node, to_node, weight):
+        if from_node not in self.edges:
+            self.edges[from_node] = []
+        self.edges[from_node].append((to_node, weight))
+        if to_node not in self.edges:
+            self.edges[to_node] = []
+        self.edges[to_node].append((from_node, weight))
+
+    def set_heuristic(self, node, value):
+        self.heuristics[node] = value
+
+    def heuristic(self, node, goal):
+        return self.heuristics.get(node, 0)
+
+    def a_star(self, start, goal):
+        open_set = []
+        heapq.heappush(open_set, (0, start))
+        came_from = {}
+        g_score = {node: float('inf') for node in self.edges}
+        g_score[start] = 0
+        f_score = {node: float('inf') for node in self.edges}
+        f_score[start] = self.heuristic(start, goal)
+
+        while open_set:
+            _, current = heapq.heappop(open_set)
+
+            if current == goal:
+                path = self.reconstruct_path(came_from, start, goal)
+                return path, g_score[goal]
+
+            for neighbor, weight in self.edges.get(current, []):
+                tentative_g_score = g_score[current] + weight
+                if tentative_g_score < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = g_score[neighbor] + self.heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+
+        return None, float('inf')
+
+    def reconstruct_path(self, came_from, start, goal):
+        path = [goal]
+        while goal in came_from:
+            goal = came_from[goal]
+            path.append(goal)
+        path.reverse()
+        return path
+
+def get_valid_input(prompt):
+    while True:
+        node = input(prompt).strip().upper()
+        if node in 'ABCDEFGHIJ' and len(node) == 1:
+            return node
+        else:
+            print("Invalid")
+
+# Example usage:
+graph = Graph()
+
+# Add edges based on the provided data
+graph.add_edge('A', 'B', 4.157)
+graph.add_edge('A', 'C', 3.072)
+graph.add_edge('A', 'H', 3.015)
+graph.add_edge('A', 'J', 3.040)
+graph.add_edge('B', 'C', 2.070)
+graph.add_edge('B', 'D', 1.958)
+graph.add_edge('C', 'D', 1.538)
+graph.add_edge('D', 'E', 1.921)
+graph.add_edge('E', 'F', 1.472)
+graph.add_edge('E', 'G', 2.051)
+graph.add_edge('F', 'G', 0.926)
+graph.add_edge('H', 'I', 1.675)
+graph.add_edge('I', 'J', 2.271)
+
+# Set heuristics based on the provided data
+graph.set_heuristic('A', 2500)
+graph.set_heuristic('B', 2000)
+graph.set_heuristic('C', 1500)
+graph.set_heuristic('D', 1000)
+graph.set_heuristic('E', 2000)
+graph.set_heuristic('F', 0)
+graph.set_heuristic('G', 500)
+graph.set_heuristic('H', 6000)
+graph.set_heuristic('I', 2000)
+graph.set_heuristic('J', 2800)
+
+# Get user input for start and goal nodes
+start_node = get_valid_input("Asal (A-J): ")
+goal_node = get_valid_input("Tujuan (A-J): ")
+
+# Perform A* search
+path, cost = graph.a_star(start_node, goal_node)
+
+if path:
+    print(f"Langkah: {' -> '.join(path)}")
+    print(f"Jarak: {cost:.3f} km")
+else:
+    print("Tidak ada langkah yang diketemukan dari {} ke {}".format(start_node, goal_node))
