@@ -8,11 +8,11 @@ class Graph:
         self.heuristics = {}
 
     def add_edge(self, from_node, to_node, weight):
-        if from_node not in self.edges:
-            self.edges[from_node] = []
-        self.edges[from_node].append((to_node, weight))
-        if to_node not in self.edges:
-            self.edges[to_node] = []
+    if from_node not in self.edges:
+        self.edges[from_node] = []
+    self.edges[from_node].append((to_node, weight))
+    if to_node not in self.edges:
+        self.edges[to_node] = []
         self.edges[to_node].append((from_node, weight))
 
     def set_heuristic(self, node, value):
