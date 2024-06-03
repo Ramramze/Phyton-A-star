@@ -1,9 +1,9 @@
-pip install streamlit-folium
+from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
 
 import streamlit as st
 import heapq
 import pandas as pd
-import folium
 
 class Graph:
     def __init__(self):
