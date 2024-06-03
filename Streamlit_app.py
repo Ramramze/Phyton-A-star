@@ -113,6 +113,8 @@ location_map = {
     'Kantor Pos Tengku Amir Hamza': 'J'
 }
 
+m = folium.Map(location=[-7.306962488928328, 112.735077094551], zoom_start=12)
+
 # Mendapatkan user input
 start_location = st.selectbox('Pilih Awal', list(location_map.keys()))
 goal_location = st.selectbox('Pilih Tujuan', list(location_map.keys()))
