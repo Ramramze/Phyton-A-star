@@ -3,7 +3,7 @@ import heapq
 import pandas as pd
 
 class Graph:
-    def _init_(self):
+    def __init__(self):
         self.edges = {}
         self.heuristics = {}
 
