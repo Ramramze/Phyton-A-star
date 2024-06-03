@@ -1,7 +1,6 @@
 import streamlit as st
 import heapq
 import pandas as pd
-import folium
 
 class Graph:
     def __init__(self):
@@ -113,8 +112,6 @@ location_map = {
     'Kantor Pos Gatot Subroto': 'I',
     'Kantor Pos Tengku Amir Hamza': 'J'
 }
-
-m = folium.Map(location=[-7.306962488928328, 112.735077094551], zoom_start=12)
 
 # Mendapatkan user input
 start_location = st.selectbox('Pilih Awal', list(location_map.keys()))
