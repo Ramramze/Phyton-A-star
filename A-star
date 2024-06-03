@@ -1,7 +1,9 @@
+import streamlit as st
 import heapq
+import pandas as pd
 
 class Graph:
-    def __init__(self):
+    def _init_(self):
         self.edges = {}
         self.heuristics = {}
 
@@ -53,53 +55,86 @@ class Graph:
         path.reverse()
         return path
 
-def get_valid_input(prompt):
-    while True:
-        node = input(prompt).strip().upper()
-        if node in 'ABCDEFGHIJ' and len(node) == 1:
-            return node
-        else:
-            print("Invalid")
-
-# Example usage:
+#Inisialisasi graf
 graph = Graph()
 
-# Add edges based on the provided data
-graph.add_edge('A', 'B', 4.157)
-graph.add_edge('A', 'C', 3.072)
-graph.add_edge('A', 'H', 3.015)
-graph.add_edge('A', 'J', 3.040)
-graph.add_edge('B', 'C', 2.070)
-graph.add_edge('B', 'D', 1.958)
-graph.add_edge('C', 'D', 1.538)
-graph.add_edge('D', 'E', 1.921)
-graph.add_edge('E', 'F', 1.472)
-graph.add_edge('E', 'G', 2.051)
-graph.add_edge('F', 'G', 0.926)
-graph.add_edge('H', 'I', 1.675)
-graph.add_edge('I', 'J', 2.271)
+# Menambahkan edge atau jarak
+edges = [
+    ('A', 'B', 4.157), ('A', 'C', 3.072), ('A', 'H', 3.015), ('A', 'J', 3.040),
+    ('B', 'C', 2.070), ('B', 'D', 1.958), ('C', 'D', 1.538), ('D', 'E', 1.921),
+    ('E', 'F', 1.472), ('E', 'G', 2.051), ('F', 'G', 0.926), ('H', 'I', 1.675),
+    ('I', 'J', 2.271)
+]
+for edge in edges:
+    graph.add_edge(*edge)
 
-# Set heuristics based on the provided data
-graph.set_heuristic('A', 2500)
-graph.set_heuristic('B', 2000)
-graph.set_heuristic('C', 1500)
-graph.set_heuristic('D', 1000)
-graph.set_heuristic('E', 2000)
-graph.set_heuristic('F', 0)
-graph.set_heuristic('G', 500)
-graph.set_heuristic('H', 6000)
-graph.set_heuristic('I', 2000)
-graph.set_heuristic('J', 2800)
+# Menambahkan nilai heuristic
+heuristics = {
+    'A': 2500, 'B': 2000, 'C': 1500, 'D': 1000,
+    'E': 2000, 'F': 0, 'G': 500, 'H': 6000,
+    'I': 2000, 'J': 2800
+}
+for node, value in heuristics.items():
+    graph.set_heuristic(node, value)
 
-# Get user input for start and goal nodes
-start_node = get_valid_input("Asal (A-J): ")
-goal_node = get_valid_input("Tujuan (A-J): ")
+# Membuat dataframe yang akan menampilkan nilai heuristic pada streamlit sebagai tabel
+heuristics_df = pd.DataFrame(list(heuristics.items()), columns=['Node', 'Heuristic'])
+heuristics_df['Location'] = heuristics_df['Node'].map({
+    'A': 'Kantor Pos Pusat Medan',
+    'B': 'Komplek Bandar Selamat Permai',
+    'C': 'Kantor Pos Bakaran Batu',
+    'D': 'Kantor Pos Laksamana',
+    'E': 'Kantor Pos Menteng',
+    'F': 'Kantor Pos SM. Raja Medan',
+    'G': 'Kantor Pos Alfalah',
+    'H': 'Kantor Pos Medan Baru',
+    'I': 'Kantor Pos Gatot Subroto',
+    'J': 'Kantor Pos Tengku Amir Hamza'
+})
 
-# Perform A* search
-path, cost = graph.a_star(start_node, goal_node)
+# Judul pada streamlit
+st.title('PENCARIAN JALUR TERPENDEK PENGIRIMAN BARANG MENGGUNAKAN ALGORITMA A*')
 
-if path:
-    print(f"Langkah: {' -> '.join(path)}")
-    print(f"Jarak: {cost:.3f} km")
-else:
-    print("Tidak ada langkah yang diketemukan dari {} ke {}".format(start_node, goal_node))
+# Menampilkan tabel
+st.subheader('Nilai Heuristik')
+st.table(heuristics_df[['Location', 'Heuristic']])
+
+# Mapping untuk display nama
+location_map = {
+    'Kantor Pos Pusat Medan': 'A',
+    'Komplek Bandar Selamat Permai': 'B',
+    'Kantor Pos Bakaran Batu': 'C',
+    'Kantor Pos Laksamana': 'D',
+    'Kantor Pos Menteng': 'E',
+    'Kantor Pos SM. Raja Medan': 'F',
+    'Kantor Pos Alfalah': 'G',
+    'Kantor Pos Medan Baru': 'H',
+    'Kantor Pos Gatot Subroto': 'I',
+    'Kantor Pos Tengku Amir Hamza': 'J'
+}
+
+# Mendapatkan user input
+start_location = st.selectbox('Pilih Awal', list(location_map.keys()))
+goal_location = st.selectbox('Pilih Tujuan', list(location_map.keys()))
+
+# Mengkonversi nama lokasi menjadi node
+start_node = location_map[start_location]
+goal_node = location_map[goal_location]
+
+# Melakukan algoritma pencarian A*
+if st.button('Cari'):
+    path, cost = graph.a_star(start_node, goal_node)
+    if path:
+        path_locations = [key for key, value in location_map.items() if value in path]
+        result = f"Langkah: {' -> '.join(path_locations)}\n\n*Jarak:* {cost:.3f} km"
+    else:
+        result = f"Tidak ada langkah yang ditemukan dari {start_location} ke {goal_location}"
+
+    st.markdown(
+        f"""
+        <div style="padding: 10px; border: 1px solid gray; border-radius: 5px; background-color: #f9f9f9; color: #333;">
+            {result}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
