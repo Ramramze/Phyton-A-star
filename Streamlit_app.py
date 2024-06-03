@@ -1,6 +1,7 @@
 import streamlit as st
 import heapq
 import pandas as pd
+import folium
 
 class Graph:
     def __init__(self):
