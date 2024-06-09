@@ -1,5 +1,3 @@
-from geopy.geocoders import Nominatim
-
 import streamlit as st
 import heapq
 import pandas as pd
